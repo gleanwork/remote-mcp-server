@@ -10,10 +10,6 @@
   <a href="https://registry.modelcontextprotocol.io">MCP Registry</a>
 </p>
 
-<p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></a>
-</p>
-
 ---
 
 Remote MCP Server that securely connects Glean Enterprise Knowledge with your IDE, LLM, or agent platform of choice.
@@ -37,6 +33,7 @@ Each organization has a unique Glean MCP server URL. To set up the Glean MCP Ser
 **[View the Setup Guide](https://docs.glean.com/administration/platform/mcp/enable-mcp-servers)**
 
 The guide covers:
+
 - Obtaining your organization's MCP server URL
 - Configuring your MCP client (Claude Desktop, Cursor, etc.)
 - Authentication setup
