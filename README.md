@@ -5,9 +5,9 @@
 <h1 align="center">Glean Remote MCP Server</h1>
 
 <p align="center">
-  <a href="https://docs.glean.com/administration/platform/mcp/about">Documentation</a> |
-  <a href="https://docs.glean.com/administration/platform/mcp/enable-mcp-servers">Setup Guide</a> |
-  <a href="https://registry.modelcontextprotocol.io">MCP Registry</a>
+  <a href="https://docs.glean.com/administration/platform/mcp/about" target="_blank">Documentation</a> |
+  <a href="https://docs.glean.com/administration/platform/mcp/enable-mcp-servers" target="_blank">Setup Guide</a> |
+  <a href="https://registry.modelcontextprotocol.io" target="_blank">MCP Registry</a>
 </p>
 
 ---
