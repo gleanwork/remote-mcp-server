@@ -1,5 +1,5 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "com.glean/mcp",
   "description": "Remote MCP Server that securely connects Glean Enterprise Knowledge with your IDE, LLM, or agents.",
   "title": "Glean",
@@ -8,7 +8,7 @@
     "url": "https://github.com/gleanwork/remote-mcp-server",
     "source": "github"
   },
-  "version": "1.0.0",
+  "version": "1.0.2",
   "icons": [
     {
       "src": "https://developers.glean.com/img/glean-logo.svg",
@@ -18,6 +18,23 @@
     {
       "src": "https://developers.glean.com/img/glean-logo.png",
       "mimeType": "image/png"
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://{instance}-be.glean.com/mcp/{server-name}",
+      "variables": {
+        "instance": {
+          "description": "Your Glean instance name (e.g., 'acme' for acme-be.glean.com). Contact your Glean admin if unsure.",
+          "isRequired": true
+        },
+        "server-name": {
+          "description": "The MCP server name",
+          "isRequired": true,
+          "default": "default"
+        }
+      }
     }
   ]
 }
