@@ -3,6 +3,13 @@
 *.key
 key.pem
 
+# Node
+node_modules/
+package-lock.json
+
+# MCP Publisher binary (downloaded during CI)
+mcp-publisher
+
 # OS files
 .DS_Store
 Thumbs.db
