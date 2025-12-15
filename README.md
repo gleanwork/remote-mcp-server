@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./glean-logo.svg" alt="Glean Logo" width="200">
+  <img src="https://developers.glean.com/img/glean-text.svg" alt="Glean Logo" width="200">
 </p>
 
 <h1 align="center">Glean Remote MCP Server</h1>

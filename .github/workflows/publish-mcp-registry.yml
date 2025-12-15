@@ -14,21 +14,83 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
+            - name: Get version from server.json
+              id: version
+              run: |
+                  VERSION=$(jq -r '.version' server.json)
+                  echo "version=$VERSION" >> $GITHUB_OUTPUT
+                  echo "📦 Local version: $VERSION"
+
+            - name: Check if version already published
+              id: check
+              run: |
+                  VERSION="${{ steps.version.outputs.version }}"
+                  echo "Checking if version $VERSION is already published..."
+
+                  # Query the registry API for existing versions
+                  RESPONSE=$(curl -sf "https://registry.modelcontextprotocol.io/v0/servers?search=com.glean/mcp" 2>/dev/null) || {
+                      echo "::warning::Failed to fetch registry data. Proceeding with publish."
+                      echo "should_publish=true" >> $GITHUB_OUTPUT
+                      exit 0
+                  }
+
+                  # Validate response is valid JSON with servers array
+                  if ! echo "$RESPONSE" | jq -e '.servers' > /dev/null 2>&1; then
+                      echo "::warning::Invalid registry response. Proceeding with publish."
+                      echo "should_publish=true" >> $GITHUB_OUTPUT
+                      exit 0
+                  fi
+
+                  # Get the latest published version (the one with isLatest: true)
+                  PUBLISHED_VERSION=$(echo "$RESPONSE" | jq -r '
+                      .servers[] |
+                      select(._meta."io.modelcontextprotocol.registry/official".isLatest == true) |
+                      .server.version // empty
+                  ' 2>/dev/null | head -1)
+
+                  # Fallback: check if this exact version exists anywhere in the results
+                  VERSION_EXISTS=$(echo "$RESPONSE" | jq -r --arg v "$VERSION" '
+                      [.servers[].server.version] | any(. == $v)
+                  ' 2>/dev/null)
+
+                  echo "📡 Latest published version: ${PUBLISHED_VERSION:-none}"
+
+                  if [ "$VERSION_EXISTS" = "true" ]; then
+                      echo "should_publish=false" >> $GITHUB_OUTPUT
+                      echo "::notice::Version $VERSION already exists in the registry. Skipping publish."
+                  else
+                      echo "should_publish=true" >> $GITHUB_OUTPUT
+                      echo "✅ Version $VERSION is new, will publish."
+                  fi
+
             - name: Install MCP Publisher
+              if: steps.check.outputs.should_publish == 'true'
               run: |
                   curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
 
             - name: Login to MCP Registry
+              if: steps.check.outputs.should_publish == 'true'
               run: ./mcp-publisher login dns --domain glean.com --private-key "${{ secrets.MCP_PRIVATE_KEY }}"
 
             - name: Publish to Registry
+              if: steps.check.outputs.should_publish == 'true'
               run: ./mcp-publisher publish
 
             - name: Report Success
-              if: success()
+              if: steps.check.outputs.should_publish == 'true' && success()
               run: |
-                  VERSION=$(jq -r '.version' server.json)
-                  echo "Successfully published Glean MCP Server version $VERSION to the registry"
+                  VERSION="${{ steps.version.outputs.version }}"
+                  echo "✅ Successfully published Glean MCP Server version $VERSION to the registry"
                   echo ""
                   echo "Verifying registry entry..."
                   curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=com.glean/mcp" | jq
+
+            - name: Report Skipped
+              if: steps.check.outputs.should_publish == 'false'
+              run: |
+                  VERSION="${{ steps.version.outputs.version }}"
+                  echo "ℹ️ Skipped publishing - version $VERSION is already in the registry"
+                  echo ""
+                  echo "To publish a new version:"
+                  echo "  1. Run 'npm run release' to bump the version"
+                  echo "  2. Or manually update the version in server.json"

@@ -21,9 +21,13 @@ The `server.json` file at the repository root defines our MCP server metadata. I
 - `websiteUrl`: Points to setup documentation
 - `icons`: Logo assets for display in MCP clients
 
-**Why no `remotes` or `packages`?**
+**About the `remotes` section:**
 
-Each organization has a unique Glean MCP server URL (e.g., `https://acme-be.glean.com/mcp/default`). The registry cannot represent customer-specific URLs, so we use the minimal metadata pattern (similar to embedded MCP servers) where the registry provides discovery and our `websiteUrl` provides setup instructions. See the [generic server.json documentation](https://github.com/modelcontextprotocol/registry/blob/main/docs/reference/server-json/generic-server-json.md) for more details.
+The `remotes` section includes a placeholder URL (`https://acme-be.glean.com/mcp/default`) to enable one-click installation in MCP clients like VSCode. However, each organization has a unique Glean MCP server URL, so users must update this to their organization-specific endpoint after installation.
+
+**Future improvement:** When the MCP registry supports URL template variables (schema 2025-12-11+), we will update to use `https://{instance}-be.glean.com/mcp/{server-name}` which will prompt users for their instance name during setup. The template version is saved in `server-2025-12-11.json` for when the mcp-publisher tool is updated to support the newer schema.
+
+See the [generic server.json documentation](https://github.com/modelcontextprotocol/registry/blob/main/docs/reference/server-json/generic-server-json.md) for more details.
 
 ## Publishing Process
 
@@ -88,9 +92,11 @@ The CLI will:
 
 ### Common Errors
 
-**"invalid remote URL"**: You have dynamic variables in a `remotes` URL. For Glean's hosted service, remove the `remotes` section entirely.
+**"deprecated schema detected"**: The mcp-publisher version doesn't support the schema version in server.json. Update to the latest mcp-publisher or use an older schema version. Check the [schema changelog](https://github.com/modelcontextprotocol/registry/blob/main/docs/reference/server-json/CHANGELOG.md) for supported versions.
 
-**"namespace verification failed"**: Ensure you're authenticated with GitHub and have appropriate permissions for the gleanwork organization.
+**"invalid remote URL"**: The URL in `remotes` contains unsupported characters or invalid format. Ensure the URL is a valid HTTPS endpoint.
+
+**"namespace verification failed"**: Ensure you're authenticated with the correct domain and have access to the private key for glean.com.
 
 ## Where the Server Appears
 
