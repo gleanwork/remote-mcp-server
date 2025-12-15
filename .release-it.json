@@ -23,6 +23,10 @@
         {
           "file": "server.json",
           "path": "version"
+        },
+        {
+          "file": "package.json",
+          "path": "version"
         }
       ]
     }

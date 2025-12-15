@@ -28,14 +28,36 @@ jobs:
                   echo "Checking if version $VERSION is already published..."
 
                   # Query the registry API for existing versions
-                  RESPONSE=$(curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=com.glean/mcp")
-                  PUBLISHED_VERSION=$(echo "$RESPONSE" | jq -r '.servers[0].version // empty')
+                  RESPONSE=$(curl -sf "https://registry.modelcontextprotocol.io/v0/servers?search=com.glean/mcp" 2>/dev/null) || {
+                      echo "::warning::Failed to fetch registry data. Proceeding with publish."
+                      echo "should_publish=true" >> $GITHUB_OUTPUT
+                      exit 0
+                  }
 
-                  echo "📡 Published version: ${PUBLISHED_VERSION:-none}"
+                  # Validate response is valid JSON with servers array
+                  if ! echo "$RESPONSE" | jq -e '.servers' > /dev/null 2>&1; then
+                      echo "::warning::Invalid registry response. Proceeding with publish."
+                      echo "should_publish=true" >> $GITHUB_OUTPUT
+                      exit 0
+                  fi
 
-                  if [ "$VERSION" = "$PUBLISHED_VERSION" ]; then
+                  # Get the latest published version (the one with isLatest: true)
+                  PUBLISHED_VERSION=$(echo "$RESPONSE" | jq -r '
+                      .servers[] |
+                      select(._meta."io.modelcontextprotocol.registry/official".isLatest == true) |
+                      .server.version // empty
+                  ' 2>/dev/null | head -1)
+
+                  # Fallback: check if this exact version exists anywhere in the results
+                  VERSION_EXISTS=$(echo "$RESPONSE" | jq -r --arg v "$VERSION" '
+                      [.servers[].server.version] | any(. == $v)
+                  ' 2>/dev/null)
+
+                  echo "📡 Latest published version: ${PUBLISHED_VERSION:-none}"
+
+                  if [ "$VERSION_EXISTS" = "true" ]; then
                       echo "should_publish=false" >> $GITHUB_OUTPUT
-                      echo "::notice::Version $VERSION is already published. Skipping publish."
+                      echo "::notice::Version $VERSION already exists in the registry. Skipping publish."
                   else
                       echo "should_publish=true" >> $GITHUB_OUTPUT
                       echo "✅ Version $VERSION is new, will publish."
