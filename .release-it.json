@@ -8,9 +8,7 @@
     "release": true,
     "releaseName": "v${version}"
   },
-  "npm": {
-    "publish": false
-  },
+  "npm": false,
   "plugins": {
     "@release-it/conventional-changelog": {
       "preset": {
@@ -19,6 +17,10 @@
       "infile": "CHANGELOG.md"
     },
     "@release-it/bumper": {
+      "in": {
+        "file": "package.json",
+        "path": "version"
+      },
       "out": [
         {
           "file": "server.json",
