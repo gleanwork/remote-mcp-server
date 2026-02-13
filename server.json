@@ -25,11 +25,12 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://{instance}-be.glean.com/mcp/{server-name}",
+      "url": "https://{baseUrl}/mcp/{server-name}",
       "variables": {
-        "instance": {
-          "description": "Your Glean instance name (e.g., 'acme' for acme-be.glean.com). Contact your Glean admin if unsure.",
-          "isRequired": true
+        "baseUrl": {
+          "description": "Your Glean backend domain. For most deployments this follows the pattern '{instance}-be.glean.com' (e.g., 'acme-be.glean.com'). If your organization uses a custom domain, enter that domain instead. Contact your Glean admin if unsure.",
+          "isRequired": true,
+          "placeholder": "acme-be.glean.com"
         },
         "server-name": {
           "description": "The MCP server name",
