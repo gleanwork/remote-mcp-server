@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.2.0](https://github.com/gleanwork/remote-mcp-server/compare/v1.1.0...v1.2.0) (2026-02-13)
+
+### Features
+
+* Support custom domains in MCP server URL template ([#6](https://github.com/gleanwork/remote-mcp-server/issues/6)) ([1119370](https://github.com/gleanwork/remote-mcp-server/commit/1119370be057aa0671d906dee5604900808ea9ab))
+
 ## 1.1.0 (2026-01-19)
 
 ### Features
